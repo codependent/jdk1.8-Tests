@@ -1,4 +1,4 @@
-# Java 8 Tests
+# Spring Boot Applicationt - JDK 1.8 Tests
 
 Spring Boot Application (Spring-Data-JPA based) showcasing JDK 1.8 new features
 
