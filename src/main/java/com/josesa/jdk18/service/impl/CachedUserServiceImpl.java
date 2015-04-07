@@ -1,33 +1,43 @@
 package com.josesa.jdk18.service.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.Optional;
 
-import com.josesa.jdk18.dto.Person;
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+import com.josesa.jdk18.dao.PersonDAO;
+import com.josesa.jdk18.entity.Person;
 import com.josesa.jdk18.service.UserService;
-import com.josesa.jdk18.util.RandomData;
 
+@Service("cachedUserService")
+@Profile("cached")
+@Transactional
 public class CachedUserServiceImpl implements UserService{
 
-	private Map<Integer, Person> cache = new HashMap<Integer, Person>();
+	@Autowired
+	private PersonDAO personDAO;
 	
-	private List<Person> mockedDataSource = new ArrayList<Person>();
+	private Map<Long, Person> cache = new HashMap<Long, Person>();
 	
-	public CachedUserServiceImpl(){
-		mockedDataSource = RandomData.generatePeople(1000000);
+	@Override
+	public Person save(Person p) {
+		return personDAO.save(p);
 	}
 	
 	@Override
-	public Person getPerson(int id) {
-		Optional<Person> searched = mockedDataSource.stream().filter( p -> p.getId() == id).findFirst();
+	public Person get(long id) {
+		Optional<Person> searched = personDAO.findOne(id);
 		if(searched.isPresent()){
 			Person person = searched.get();
 			cache.put(person.getId(), person);
@@ -45,11 +55,11 @@ public class CachedUserServiceImpl implements UserService{
 	@Override
 	public List<Person> search(Predicate<Person> criteria, int maxResults){
 		if(maxResults >0){
-			return mockedDataSource.stream().parallel()
+			return personDAO.streamAllPeople().parallel()
 					.filter(criteria).limit(maxResults)
 					.collect(Collectors.toList());
 		}else{
-			return mockedDataSource.stream().parallel()
+			return personDAO.streamAllPeople().parallel()
 					.filter(criteria)
 					.collect(Collectors.toList());
 		}
@@ -67,12 +77,12 @@ public class CachedUserServiceImpl implements UserService{
 		return people.stream().parallel().peek( p ->  logger.info("{}", p) );
 	}
 
-	public Map<Integer, Person> getCache() {
+	public Map<Long, Person> getCache() {
 		return cache;
 	}
 
 	@Override
-	public Iterator<Entry<Integer, Person>> iterator() {
+	public Iterator<Entry<Long, Person>> iterator() {
 		return cache.entrySet().iterator();
 	}
 

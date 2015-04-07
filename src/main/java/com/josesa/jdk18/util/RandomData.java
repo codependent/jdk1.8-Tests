@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.josesa.jdk18.dto.Person;
+import com.josesa.jdk18.entity.Person;
 
 public class RandomData {
 	

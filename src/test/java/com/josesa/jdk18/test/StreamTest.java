@@ -8,24 +8,33 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.josesa.jdk18.dto.Person;
+import com.josesa.jdk18.Application;
+import com.josesa.jdk18.entity.Person;
 import com.josesa.jdk18.service.UserService;
-import com.josesa.jdk18.service.impl.CachedUserServiceImpl;
+import com.josesa.jdk18.util.RandomData;
 
-
-public class StreamTest {
+@ContextConfiguration(classes=Application.class)
+@ActiveProfiles("cached")
+public class StreamTest extends AbstractTestNGSpringContextTests{
 
 	private static final int MAX_RESULTS = 100;
 	private Logger logger = LoggerFactory.getLogger(getClass());
+	
+	@Autowired
 	private UserService userService;
 	
-	@BeforeTest
-	public void setUp(){
-		userService = new CachedUserServiceImpl();
+	@BeforeClass
+	public void beforeClass(){
+		List<Person> people = RandomData.generatePeople(100000);
+		people.stream().forEach(userService::save);
 	}
 	
 	@Test

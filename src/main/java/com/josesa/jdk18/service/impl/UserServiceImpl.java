@@ -9,23 +9,37 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.josesa.jdk18.dto.Person;
-import com.josesa.jdk18.service.UserService;
-import com.josesa.jdk18.util.RandomData;
+import javax.transaction.Transactional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+import com.josesa.jdk18.dao.PersonDAO;
+import com.josesa.jdk18.entity.Person;
+import com.josesa.jdk18.service.UserService;
+
+@Service("userService")
+@Profile("not-cached")
+@Transactional
 public class UserServiceImpl implements UserService{
 
+	@Autowired
+	private PersonDAO personDAO;
+	
 	private List<Person> mockedDataSource = new ArrayList<Person>();
 	
-	public UserServiceImpl(){
-		mockedDataSource = RandomData.generatePeople(1000000);
+	@Override
+	public Person save(Person p) {
+		return personDAO.save(p);
 	}
 	
 	@Override
-	public Person getPerson(int id) {
-		Optional<Person> searched = mockedDataSource.stream().filter( p -> p.getId() == id).findFirst();
+	public Person get(long id) {
+		Optional<Person> searched = personDAO.findOne(id);
 		if(searched.isPresent()){
-			return searched.get();
+			Person person = searched.get();
+			return person;
 		}else{
 			return null;
 		}
@@ -61,7 +75,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public Iterator<Entry<Integer, Person>> iterator() {
+	public Iterator<Entry<Long, Person>> iterator() {
 		throw new IllegalAccessError("Implementación UserServiceImpl no tiene caché y no puede iterarse");
 	}
 

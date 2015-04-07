@@ -1,13 +1,20 @@
-package com.josesa.jdk18.dto;
-
+package com.josesa.jdk18.entity;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class Person implements Serializable{
 
 	private static final long serialVersionUID = -4951731015505244846L;
 
-	private int id;
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private long id;
 	
 	private String name;
 	
@@ -21,7 +28,7 @@ public class Person implements Serializable{
 	
 	public Person(){}
 	
-	public Person(int id, String name, String middleName, String surname1, String surname2, LocalDate birthDate) {
+	public Person(long id, String name, String middleName, String surname1, String surname2, LocalDate birthDate) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -31,11 +38,11 @@ public class Person implements Serializable{
 		this.birthDate = birthDate;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 	
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 	
