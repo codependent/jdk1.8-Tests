@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.Optional;
 
 import com.josesa.jdk18.dto.Person;
@@ -32,6 +35,36 @@ public class CachedUserServiceImpl implements UserService{
 		}else{
 			return null;
 		}
+	}
+	
+	@Override
+	public List<Person> search(Predicate<Person> criteria){
+		return search(criteria, 0);
+	}
+	
+	@Override
+	public List<Person> search(Predicate<Person> criteria, int maxResults){
+		if(maxResults >0){
+			return mockedDataSource.stream().parallel()
+					.filter(criteria).limit(maxResults)
+					.collect(Collectors.toList());
+		}else{
+			return mockedDataSource.stream().parallel()
+					.filter(criteria)
+					.collect(Collectors.toList());
+		}
+	}
+	
+	@Override
+	public void print(List<Person> people) {
+		logger.info("Printing {} people:", people.size());
+		people.stream().parallel().forEach( p -> logger.info("{}", p) );
+	}
+	
+	@Override
+	public Stream<Person> printAndReturnStream(List<Person> people) {
+		logger.info("Printing {} people:", people.size());
+		return people.stream().parallel().peek( p ->  logger.info("{}", p) );
 	}
 
 	public Map<Integer, Person> getCache() {
