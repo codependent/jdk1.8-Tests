@@ -52,9 +52,9 @@ public class StreamTest {
 		Assert.assertTrue(people.size()>0);
 		
 		Stream<String> reducedList = people.stream().parallel()
-													.map( p -> {Period period = Period.between(p.getBirthDate(), LocalDate.now()); 
-													   			return p.getFullName() + " - " + period.getYears() + " años"; } )
-													.peek( p ->  logger.info("Underaged person -> {}", p) );
+				.map( p -> {Period period = Period.between(p.getBirthDate(), LocalDate.now()); 
+							return p.getFullName() + " - " + period.getYears() + " años"; } )
+				.peek( p ->  logger.info("Underaged person -> {}", p) );
 		Assert.assertTrue(people.size() == reducedList.count());
 		
 		
