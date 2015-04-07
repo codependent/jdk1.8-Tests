@@ -1,6 +1,6 @@
 # Java 8 Tests
 
-TestNG Tests showcasing the new Java 8 features:
+Spring Boot Application (Spring-Data-JPA based) showcasing JDK 1.8 new features
 
 * Streams (filters, map, reduce...)
 * Lambda expressions
