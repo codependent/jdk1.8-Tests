@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import com.josesa.jdk18.dao.PersonDAO;
 import com.josesa.jdk18.entity.Person;
+import com.josesa.jdk18.repository.PersonRepository;
 import com.josesa.jdk18.service.UserService;
 
 @Service("cachedUserService")
@@ -26,7 +26,7 @@ import com.josesa.jdk18.service.UserService;
 public class CachedUserServiceImpl implements UserService{
 
 	@Autowired
-	private PersonDAO personDAO;
+	private PersonRepository personDAO;
 	
 	private Map<Long, Person> cache = new HashMap<Long, Person>();
 	
@@ -55,13 +55,17 @@ public class CachedUserServiceImpl implements UserService{
 	@Override
 	public List<Person> search(Predicate<Person> criteria, int maxResults){
 		if(maxResults >0){
-			return personDAO.streamAllPeople().parallel()
-					.filter(criteria).limit(maxResults)
-					.collect(Collectors.toList());
+			try (Stream<Person> stream = personDAO.streamAllPeople()) {
+				return stream.parallel()
+				.filter(criteria).limit(maxResults)
+				.collect(Collectors.toList());
+			}
 		}else{
-			return personDAO.streamAllPeople().parallel()
-					.filter(criteria)
-					.collect(Collectors.toList());
+			try (Stream<Person> stream = personDAO.streamAllPeople()) {
+				return stream.parallel()
+						.filter(criteria)
+						.collect(Collectors.toList());
+			}
 		}
 	}
 	
