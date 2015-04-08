@@ -27,8 +27,6 @@ public class UserServiceImpl implements UserService{
 	@Autowired
 	private PersonDAO personDAO;
 	
-	private List<Person> mockedDataSource = new ArrayList<Person>();
-	
 	@Override
 	public Person save(Person p) {
 		return personDAO.save(p);
@@ -37,12 +35,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public Person get(long id) {
 		Optional<Person> searched = personDAO.findOne(id);
-		if(searched.isPresent()){
-			Person person = searched.get();
-			return person;
-		}else{
-			return null;
-		}
+		return searched.isPresent() ? searched.get() : null;
 	}
 	
 	@Override
@@ -53,11 +46,11 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public List<Person> search(Predicate<Person> criteria, int maxResults){
 		if(maxResults >=0){
-			return mockedDataSource.stream().parallel()
+			return personDAO.streamAllPeople().parallel()
 					.filter(criteria).limit(maxResults)
 					.collect(Collectors.toList());
 		}else{
-			return mockedDataSource.stream().parallel()
+			return personDAO.streamAllPeople().parallel()
 					.filter(criteria)
 					.collect(Collectors.toList());
 		}
